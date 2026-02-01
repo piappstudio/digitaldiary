@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Digital Diary</string>
+    <string name="splash_subtitle">Total privacy. No cloud. No compromise</string>
+    <string name="splash_copyright">All rights reserved by Pi App Studio Inc.</string>
+</resources>
