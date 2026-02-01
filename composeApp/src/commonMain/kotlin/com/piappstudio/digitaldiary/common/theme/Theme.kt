@@ -137,7 +137,7 @@ fun DigitalDiaryTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = DiaryTypography,
+        typography = getDiaryTypography(),
         content = content
     )
 }
