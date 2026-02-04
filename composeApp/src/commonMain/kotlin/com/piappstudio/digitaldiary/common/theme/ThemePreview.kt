@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -17,11 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-
-/**
- * Theme preview composable for design system showcase
- * Shows all 6 template colors, typography styles, and spacing tokens
- */
 
 @Preview
 @Composable
@@ -76,53 +73,61 @@ fun ThemePreview() {
                 modifier = Modifier.padding(vertical = Dimens.bigger_space)
             )
 
-            Text(
-                "Display Large",
-                style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
-            Text(
-                "Display Medium",
-                style = MaterialTheme.typography.displayMedium,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
-            Text(
-                "Display Small",
-                style = MaterialTheme.typography.displaySmall,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
+            DiaryMood.entries.forEach {
+                DigitalDiaryTheme (mode = it){
+                    Text("Typograph for ${it.name}",    style = MaterialTheme.typography.displayLarge)
 
-            Text(
-                "Headline Large",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
-            Text(
-                "Headline Medium",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
-            Text(
-                "Headline Small",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
+                    Text(
+                        "Display Large",
+                        style = MaterialTheme.typography.displayLarge,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+                    Text(
+                        "Display Medium",
+                        style = MaterialTheme.typography.displayMedium,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+                    Text(
+                        "Display Small",
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
 
-            Text(
-                "Body Large - This is the main content text style used for diary entries and detailed descriptions. It provides excellent readability.",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
-            Text(
-                "Body Medium - Secondary content text",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(bottom = Dimens.space)
-            )
-            Text(
-                "Body Small - Tertiary text",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(bottom = Dimens.bigger_space)
-            )
+                    Text(
+                        "Headline Large",
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+                    Text(
+                        "Headline Medium",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+                    Text(
+                        "Headline Small",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+
+                    Text(
+                        "Body Large - This is the main content text style used for diary entries and detailed descriptions. It provides excellent readability.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+                    Text(
+                        "Body Medium - Secondary content text",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(bottom = Dimens.space)
+                    )
+                    Text(
+                        "Body Small - Tertiary text",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(bottom = Dimens.bigger_space)
+                    )
+
+                }
+            }
+
 
             // Spacing Scale Section
             Text(

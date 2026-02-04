@@ -1,6 +1,7 @@
 package com.piappstudio.digitaldiary.common.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -8,17 +9,13 @@ import androidx.compose.runtime.Composable
 
 /**
  * Digital Diary Theme
- *
- * Provides comprehensive theming support with:
- * - Dark mode detection and override
- * - 6 catching template colors
- * - Complete typography system
- * - User preference support (when dark mode is not forced)
+ * 
+ * Provides ADA-compliant theming with:
+ * - Dynamic Light/Dark mode switching
+ * - Mode-specific typography for better readability
+ * - Accessible color schemes (WCAG 2.1 Level AA)
  */
 
-/**
- * Light color scheme for Digital Diary
- */
 private fun getLightColorScheme() = lightColorScheme(
     primary = LightColors.Primary,
     onPrimary = LightColors.OnPrimary,
@@ -32,7 +29,7 @@ private fun getLightColorScheme() = lightColorScheme(
 
     tertiary = LightColors.TemplateColor1,
     onTertiary = LightColors.OnPrimary,
-    tertiaryContainer = LightColors.TemplateColor1.copy(alpha = 0.2f),
+    tertiaryContainer = LightColors.TemplateColor1.copy(alpha = 0.1f),
     onTertiaryContainer = LightColors.TemplateColor1,
 
     background = LightColors.Background,
@@ -53,9 +50,6 @@ private fun getLightColorScheme() = lightColorScheme(
     scrim = LightColors.Scrim
 )
 
-/**
- * Dark color scheme for Digital Diary
- */
 private fun getDarkColorScheme() = darkColorScheme(
     primary = DarkColors.Primary,
     onPrimary = DarkColors.OnPrimary,
@@ -69,7 +63,7 @@ private fun getDarkColorScheme() = darkColorScheme(
 
     tertiary = DarkColors.TemplateColor1,
     onTertiary = DarkColors.OnPrimary,
-    tertiaryContainer = DarkColors.TemplateColor1.copy(alpha = 0.2f),
+    tertiaryContainer = DarkColors.TemplateColor1.copy(alpha = 0.1f),
     onTertiaryContainer = DarkColors.TemplateColor1,
 
     background = DarkColors.Background,
@@ -90,102 +84,88 @@ private fun getDarkColorScheme() = darkColorScheme(
     scrim = DarkColors.Scrim
 )
 
-/**
- * Theme mode configuration
- */
 enum class ThemeMode {
     LIGHT,
     DARK,
-    AUTO  // Uses system preference
+    AUTO
 }
 
-
-/**
- * Main theme composable
- *
- * @param darkMode Force dark mode when true. When null, uses system preference.
- * @param themePreferences Optional ThemePreferences to listen to mood changes
- * @param content The composable content to apply the theme to.
- */
 @Composable
 fun DigitalDiaryTheme(
     darkMode: Boolean? = null,
+    mode: DiaryMood = DiaryMood.CALM,
     themePreferences: ThemePreferences? = null,
     content: @Composable () -> Unit
 ) {
-    // Determine if dark mode should be used
+    // Determine the effective mode
     val useDarkMode = when {
-        darkMode != null -> darkMode  // Force dark/light mode if specified
-        else -> isSystemInDarkTheme()  // Use system preference
+        darkMode != null -> darkMode
+        themePreferences != null -> themePreferences.isDarkModeEnabled()
+        else -> isSystemInDarkTheme()
     }
 
-    // Get the base color scheme
-    var colorScheme = if (useDarkMode) {
-        getDarkColorScheme()
-    } else {
-        getLightColorScheme()
-    }
+    // Select the base color scheme
+    var colorScheme = if (useDarkMode) getDarkColorScheme() else getLightColorScheme()
 
-    // Override primary color if mood is selected
+    // Apply mood override if selected, ensuring it uses the mode-specific template color
     themePreferences?.selectedMood?.let { mood ->
-        val moodColor = mood.getColor()
+        val moodColor = if (useDarkMode) {
+            getDarkTemplateColors()[mood.colorIndex % 6]
+        } else {
+            getLightTemplateColors()[mood.colorIndex % 6]
+        }
+        
         colorScheme = colorScheme.copy(
             primary = moodColor,
-            primaryContainer = moodColor.copy(alpha = 0.2f)
+            primaryContainer = moodColor.copy(alpha = 0.15f),
+            onPrimaryContainer = moodColor
         )
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = getDiaryTypography(),
+        typography = getDiaryTypography(isDarkMode = useDarkMode, mode),
         content = content
     )
 }
 
 /**
- * Extension to easily access template colors based on theme
+ * Helper functions to get mode-specific template colors
  */
+fun getLightTemplateColors() = listOf(
+    LightColors.TemplateColor1,
+    LightColors.TemplateColor2,
+    LightColors.TemplateColor3,
+    LightColors.TemplateColor4,
+    LightColors.TemplateColor5,
+    LightColors.TemplateColor6
+)
+
+fun getDarkTemplateColors() = listOf(
+    DarkColors.TemplateColor1,
+    DarkColors.TemplateColor2,
+    DarkColors.TemplateColor3,
+    DarkColors.TemplateColor4,
+    DarkColors.TemplateColor5,
+    DarkColors.TemplateColor6
+)
+
 @Composable
 fun getTemplateColors(): List<androidx.compose.ui.graphics.Color> {
-    val isDarkMode = isSystemInDarkTheme()
-    return if (isDarkMode) {
-        listOf(
-            DarkColors.TemplateColor1,
-            DarkColors.TemplateColor2,
-            DarkColors.TemplateColor3,
-            DarkColors.TemplateColor4,
-            DarkColors.TemplateColor5,
-            DarkColors.TemplateColor6
-        )
-    } else {
-        listOf(
-            LightColors.TemplateColor1,
-            LightColors.TemplateColor2,
-            LightColors.TemplateColor3,
-            LightColors.TemplateColor4,
-            LightColors.TemplateColor5,
-            LightColors.TemplateColor6
-        )
-    }
+    return if (isSystemInDarkTheme()) getDarkTemplateColors() else getLightTemplateColors()
 }
 
-/**
- * Get a specific template color by index
- */
 @Composable
 fun getTemplateColor(index: Int): androidx.compose.ui.graphics.Color {
     val colors = getTemplateColors()
     return colors[index % colors.size]
 }
 
-/**
- * Template color names for reference
- */
 object TemplateColorNames {
-    const val COLOR_1_NAME = "Love & Romance"      // Pink
-    const val COLOR_2_NAME = "Energy & Work"       // Amber
-    const val COLOR_3_NAME = "Success & Growth"    // Emerald
-    const val COLOR_4_NAME = "Dreams & Creativity" // Violet
-    const val COLOR_5_NAME = "Passion & Adventure" // Rose
-    const val COLOR_6_NAME = "Calm & Peace"        // Cyan
+    const val COLOR_1_NAME = "Love & Romance"
+    const val COLOR_2_NAME = "Energy & Work"
+    const val COLOR_3_NAME = "Success & Growth"
+    const val COLOR_4_NAME = "Dreams & Creativity"
+    const val COLOR_5_NAME = "Passion & Adventure"
+    const val COLOR_6_NAME = "Calm & Peace"
 }
