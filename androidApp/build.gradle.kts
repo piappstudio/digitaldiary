@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 // https://github.com/kotlin-hands-on/get-started-with-cm/blob/main/gradle/libs.versions.toml
 //https://github.com/kotlin-hands-on/get-started-with-cm/tree/new-project-structure
 plugins {
-    alias(libs.plugins.jetbrainKotlinAndroid)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
@@ -21,7 +20,7 @@ kotlin {
     }
     dependencies {
 
-        implementation(project(":composeApp"))
+        implementation(projects.composeApp)
 
         implementation(libs.compose.uiToolingPreview)
         implementation(libs.androidx.activity.compose)
