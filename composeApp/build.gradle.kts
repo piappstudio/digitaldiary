@@ -4,19 +4,14 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -65,19 +60,23 @@ kotlin {
             implementation(libs.kotlinx.coroutinesSwing)
         }
     }
-}
 
-android {
-    namespace = "com.piappstudio.digitaldiary.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+    androidLibrary {
+        namespace = "com.piappstudio.digitaldiary.shard"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+
+        androidResources {
+            enable = true
+        }
+
     }
 }
 
 dependencies {
-    debugImplementation(libs.compose.uiTooling)
+    androidRuntimeClasspath(libs.compose.uiTooling)
 }
 
 compose.desktop {
