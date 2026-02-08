@@ -1,29 +1,40 @@
 package com.piappstudio.digitaldiary
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
+import com.piappstudio.digitaldiary.di.commonModule
 import com.piappstudio.digitaldiary.ui.welcome.SplashScreen
-import org.jetbrains.compose.resources.painterResource
-
-import digitaldiary.composeapp.generated.resources.Res
-import digitaldiary.composeapp.generated.resources.compose_multiplatform
+import org.koin.core.context.startKoin
+import org.koin.mp.KoinPlatformTools
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+
+    if (KoinPlatformTools.defaultContext().getOrNull() == null) {
+        startKoin(appDeclaration = {
+            // On Android, context is provided through the Application class
+            // On other platforms, we only load the common modules
+            modules(commonModule)
+        })
+    }
+
+    DigitalDiaryTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
