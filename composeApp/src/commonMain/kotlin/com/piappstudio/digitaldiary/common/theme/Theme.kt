@@ -1,7 +1,6 @@
 package com.piappstudio.digitaldiary.common.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -93,7 +92,7 @@ enum class ThemeMode {
 @Composable
 fun DigitalDiaryTheme(
     darkMode: Boolean? = null,
-    mode: DiaryMood = DiaryMood.CALM,
+    diaryMood: DiaryMood = DiaryMood.LOVE,
     themePreferences: ThemePreferences? = null,
     content: @Composable () -> Unit
 ) {
@@ -124,7 +123,7 @@ fun DigitalDiaryTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = getDiaryTypography(isDarkMode = useDarkMode, mode),
+        typography = getDiaryTypography(isDarkMode = useDarkMode, diaryMood),
         content = content
     )
 }

@@ -34,18 +34,19 @@ import kottieComposition.KottieCompositionSpec
 import kottieComposition.animateKottieCompositionAsState
 import kottieComposition.rememberKottieComposition
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Preview
 @Composable
-fun SplashScreen() {
+fun SplashScreen(viewModel: SplashViewModel = koinViewModel()) {
     // Create theme preferences and set LOVE mood
     val themePreferences = rememberThemePreferences()
 
     LaunchedEffect(Unit) {
-        themePreferences.setMood(DiaryMood.LOVE)
+        //themePreferences.setMood(DiaryMood.LOVE)
     }
 
-    DigitalDiaryTheme(themePreferences = themePreferences) {
+    DigitalDiaryTheme(themePreferences = themePreferences, darkMode = false, diaryMood = DiaryMood.PASSIONATE) {
         Scaffold {
             Box(
                 modifier = Modifier
