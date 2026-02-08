@@ -42,10 +42,10 @@ fun SplashScreen() {
     val themePreferences = rememberThemePreferences()
 
     LaunchedEffect(Unit) {
-        themePreferences.setMood(DiaryMood.LOVE)
+        //themePreferences.setMood(DiaryMood.LOVE)
     }
 
-    DigitalDiaryTheme(themePreferences = themePreferences) {
+    DigitalDiaryTheme(themePreferences = themePreferences, darkMode = false, diaryMood = DiaryMood.PASSIONATE) {
         Scaffold {
             Box(
                 modifier = Modifier
