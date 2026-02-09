@@ -16,6 +16,7 @@ kotlin = "2.3.0"
 kotlinx-coroutines = "1.10.2"
 material3 = "1.10.0-alpha05"
 kottie = "2.2.0"
+compottie = "2.0.2"
 kotlinStdlib = "2.3.0"
 runner = "1.7.0"
 core = "1.7.0"
@@ -50,7 +51,9 @@ compose-uiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-previ
 kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 
 # Compottie for rending engine
-kottie = {module = "io.github.ismai117:kottie", version.ref = "kottie"}
+#kottie = {module = "io.github.ismai117:kottie", version.ref = "kottie"}
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+
 
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
