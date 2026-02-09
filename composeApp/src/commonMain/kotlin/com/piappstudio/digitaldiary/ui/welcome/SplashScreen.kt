@@ -1,13 +1,12 @@
 package com.piappstudio.digitaldiary.ui.welcome
 
-import KottieAnimation
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,18 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.piappstudio.digitaldiary.common.theme.Dimens
-import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
 import com.piappstudio.digitaldiary.common.theme.DiaryMood
+import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
+import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.rememberThemePreferences
 import digitaldiary.composeapp.generated.resources.Res
 import digitaldiary.composeapp.generated.resources.app_name
 import digitaldiary.composeapp.generated.resources.splash_copyright
 import digitaldiary.composeapp.generated.resources.splash_subtitle
-import kottieComposition.KottieCompositionSpec
-import kottieComposition.animateKottieCompositionAsState
-import kottieComposition.rememberKottieComposition
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
+import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -60,19 +59,19 @@ fun SplashScreen(viewModel: SplashViewModel = koinViewModel()) {
                     animation = Res.readBytes("files/notes.json").decodeToString()
                 }
 
-                var playing by remember { mutableStateOf(false) }
+                val composition by rememberLottieComposition {
+                    LottieCompositionSpec.JsonString(
+                        Res.readBytes("files/notes.json").decodeToString()
+                    )
+                }
+                val progress by animateLottieCompositionAsState(composition)
 
-                val composition = rememberKottieComposition(
-                    spec = KottieCompositionSpec.File(animation) // Or KottieCompositionSpec.Url || KottieCompositionSpec.JsonString
-                )
-                val animationState by animateKottieCompositionAsState(
-                    composition = composition,
-                )
-
-                KottieAnimation(
-                    composition = composition,
-                    progress = { animationState.progress },
-                    modifier = Modifier.size(300.dp).align(Alignment.Center)
+                Image(
+                    painter = rememberLottiePainter(
+                        composition = composition,
+                        progress = { progress },
+                    ),
+                    contentDescription = "Lottie animation"
                 )
 
                 Column (

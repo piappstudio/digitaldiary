@@ -55,7 +55,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.kottie)
+            implementation(libs.compottie)
 
             // Koin
             implementation(project.dependencies.platform(libs.koin.bom))
@@ -111,6 +111,11 @@ dependencies {
 // room database
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+//because the dependency on the compose library is a project dependency
+compose.resources {
+    generateResClass = always
 }
 
 compose.desktop {
