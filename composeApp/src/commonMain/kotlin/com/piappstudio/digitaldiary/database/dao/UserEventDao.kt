@@ -24,7 +24,7 @@ interface UserEventDao {
 
     @Transaction
     @Query("SELECT * FROM event_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY strftime('%Y-%m-%d %H:%M', dateInfo) DESC")
-    fun getUserEventsByDateDesc(search: String): Flow<UserEvent>
+    fun getUserEventsByDateDesc(search: String): Flow<List<UserEvent>>
 
     @Transaction
     @Query("SELECT * FROM event_table")
@@ -46,15 +46,15 @@ interface UserEventDao {
 
     @Transaction
     @Query("SELECT * FROM event_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY title DESC")
-    fun getUserEventsByDesc(search: String): Flow<UserEvent>
+    fun getUserEventsByDesc(search: String): Flow<List<UserEvent>>
 
     @Transaction
     @Query("SELECT * FROM event_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY title ASC")
-    fun getUserEventsByAsc(search: String): Flow<UserEvent>
+    fun getUserEventsByAsc(search: String): Flow<List<UserEvent>>
 
     @Transaction
     @Query("SELECT * FROM event_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY strftime('%Y-%m-%d %H:%M', dateInfo) ASC")
-    fun getUserEventsByDateAsc(search: String): Flow<UserEvent>
+    fun getUserEventsByDateAsc(search: String): Flow<List<UserEvent>>
 
     @Transaction
     @Query("SELECT * FROM event_table WHERE eventId=:eventInfo")

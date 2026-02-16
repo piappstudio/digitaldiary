@@ -19,7 +19,7 @@ import com.piappstudio.digitaldiary.database.pojo.ReminderSortOrder
 import kotlinx.coroutines.flow.Flow
 
 class ReminderRepository(val reminderDao: ReminderDao) {
-    fun getAllReminders(filterOption: ReminderFilterOption): Flow<ReminderEvent> {
+    fun getAllReminders(filterOption: ReminderFilterOption): Flow<List<ReminderEvent>> {
 
         val query = filterOption.query ?: ""
         return when (filterOption.sortOrder) {
@@ -56,5 +56,9 @@ class ReminderRepository(val reminderDao: ReminderDao) {
 
     suspend fun update(reminderInfo: ReminderInfo) {
         reminderDao.update(reminderInfo)
+    }
+
+    suspend fun deleteAll() {
+        reminderDao.clear()
     }
 }

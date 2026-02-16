@@ -1,6 +1,5 @@
 package com.piappstudio.digitaldiary.di
 
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.piappstudio.digitaldiary.database.DiaryRepository
 import com.piappstudio.digitaldiary.database.DiaryRoomDatabase
 import com.piappstudio.digitaldiary.database.ReminderRepository

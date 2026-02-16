@@ -1,9 +1,10 @@
-package com.piappstudio.digitaldiary.navigation
+package com.piappstudio.digitaldiary.navigation.appbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.piappstudio.digitaldiary.navigation.PiRoute
 
 data class PiNavItem(
     val icon: ImageVector,

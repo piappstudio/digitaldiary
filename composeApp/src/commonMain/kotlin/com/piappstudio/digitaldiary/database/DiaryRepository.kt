@@ -21,7 +21,7 @@ import com.piappstudio.digitaldiary.database.pojo.SortingOrder
 import kotlinx.coroutines.flow.Flow
 
 class DiaryRepository(private val userEventDao: UserEventDao) {
-    fun getAllUserEvents(filterOption: FilterOption): Flow<UserEvent> {
+    fun getAllUserEvents(filterOption: FilterOption): Flow<List<UserEvent>> {
         if (filterOption.query == null) {
             filterOption.query = ""
         }
