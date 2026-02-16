@@ -18,6 +18,7 @@ material3 = "1.10.0-alpha05"
 kottie = "2.2.0"
 compottie = "2.0.2"
 kotlinStdlib = "2.3.0"
+materialIconsExtended = "1.7.3"
 runner = "1.7.0"
 core = "1.7.0"
 
@@ -30,7 +31,13 @@ kotlinx-datetime-version = "0.7.1"
 
 kermit-version = "2.0.8"
 
+multiplatform-nav3-ui = "1.0.0-alpha06"
+compose-multiplatform-lifecycle = "2.10.0-alpha05"
+icons-extended = "1.7.8"
+
+
 [libraries]
+jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -76,7 +83,13 @@ sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sql
 # Optional SQLite Wrapper available in version 2.8.0 and higher
 androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", version.ref = "room" }
 
+# Navigation Url
+jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "multiplatform-nav3-ui" }
+jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "compose-multiplatform-lifecycle" }
+
+
 kotlinx-datetime = {group = "org.jetbrains.kotlinx",name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
+
 [plugins]
 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -87,6 +100,6 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }

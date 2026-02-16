@@ -35,9 +35,8 @@ import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@Preview
 @Composable
-fun SplashScreen(viewModel: SplashViewModel = koinViewModel()) {
+fun SplashScreen(viewModel: SplashViewModel = koinViewModel(), onSplashFinished: () -> Unit) {
     // Create theme preferences and set LOVE mood
     val themePreferences = rememberThemePreferences()
 
@@ -73,6 +72,12 @@ fun SplashScreen(viewModel: SplashViewModel = koinViewModel()) {
                     ),
                     contentDescription = "Lottie animation"
                 )
+
+                LaunchedEffect(progress) {
+                    if (progress >= 1f) {
+                        onSplashFinished()
+                    }
+                }
 
                 Column (
                     modifier = Modifier
