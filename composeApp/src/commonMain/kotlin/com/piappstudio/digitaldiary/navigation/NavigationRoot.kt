@@ -15,6 +15,7 @@ import com.piappstudio.digitaldiary.common.rememberWindowType
 import com.piappstudio.digitaldiary.navigation.appbar.PiAppBottomBar
 import com.piappstudio.digitaldiary.navigation.appbar.PiAppNavigationRail
 import com.piappstudio.digitaldiary.ui.diary.DiaryDashboardScreen
+import com.piappstudio.digitaldiary.ui.diary.detail.DiaryDetailScreen
 import com.piappstudio.digitaldiary.ui.reminder.ReminderDashboardScreen
 import com.piappstudio.digitaldiary.ui.setting.SettingsDashboardScreen
 import com.piappstudio.digitaldiary.ui.welcome.SplashScreen
@@ -42,8 +43,16 @@ fun SetUpNavigationRoot() {
             Box (modifier = Modifier.fillMaxSize()) {
                 NavDisplay(backStack = appBackStack, entryProvider = entryProvider {
                     entry<PiRoute.Diary> {
-                        DiaryDashboardScreen()
+                        DiaryDashboardScreen(onNavigateDetail = { eventId ->
+                            appBackStack.add(PiRoute.DiaryDetail(eventId))
+                        })
 
+                    }
+                    entry<PiRoute.DiaryDetail> { route ->
+                        DiaryDetailScreen(
+                            eventId = route.eventId,
+                            onBackClick = { appBackStack.removeLast() }
+                        )
                     }
                     entry<PiRoute.Reminder> {
                         ReminderDashboardScreen()

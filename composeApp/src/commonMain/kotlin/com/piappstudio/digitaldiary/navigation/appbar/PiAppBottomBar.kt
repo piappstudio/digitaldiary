@@ -1,5 +1,6 @@
 package com.piappstudio.digitaldiary.navigation.appbar
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.piappstudio.digitaldiary.common.theme.Dimens
 
 fun NavBackStack<NavKey>.navigateSingleTop(route: NavKey) {
     clear()
@@ -24,6 +26,7 @@ fun PiAppBottomBar(backStack: NavBackStack<NavKey>, modifier: Modifier = Modifie
 
         bottomNavItems.forEach { (route, item) ->
             NavigationBarItem(
+                modifier = Modifier.padding(Dimens.space),
                 selected = current == route,
                 onClick = {
                     backStack.navigateSingleTop(route)

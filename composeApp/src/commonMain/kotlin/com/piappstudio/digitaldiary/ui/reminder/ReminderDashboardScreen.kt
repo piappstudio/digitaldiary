@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,6 +56,8 @@ import com.piappstudio.digitaldiary.common.theme.DiaryMood
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
 import com.piappstudio.digitaldiary.database.entity.ReminderEvent
 import com.piappstudio.digitaldiary.database.entity.ReminderInfo
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.daysUntil
 import org.koin.compose.viewmodel.koinViewModel
 
 
@@ -285,15 +289,51 @@ private fun ReminderCard(
                 }
             }
 
-            // Title
-            Text(
-                reminderEvent.reminderInfo.title,
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = Dimens.space),
-                maxLines = if (isExpanded) Int.MAX_VALUE else 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            // Title and Duration
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = Dimens.space),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    reminderEvent.reminderInfo.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                // Days Available calculation (Compact view)
+                val daysAvailable = calculateDays(reminderEvent.reminderInfo.startDate, reminderEvent.reminderInfo.endDate)
+                if (daysAvailable != null) {
+                    Surface(
+                        shape = RoundedCornerShape(Dimens.corner_full),
+                        color = priorityColor.copy(alpha = 0.1f),
+                        modifier = Modifier.padding(start = Dimens.space)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = Dimens.space, vertical = 2.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Timer,
+                                contentDescription = null,
+                                tint = priorityColor,
+                                modifier = Modifier.size(Dimens.icon_size_xs)
+                            )
+                            Text(
+                                " ${daysAvailable}d",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = priorityColor
+                            )
+                        }
+                    }
+                }
+            }
 
             // Description
             if (reminderEvent.reminderInfo.description.isNotEmpty()) {
@@ -319,7 +359,7 @@ private fun ReminderCard(
                         label = "From",
                         date = it,
                         icon = Icons.Default.DateRange,
-                        color = priorityColor
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }
 
@@ -328,7 +368,7 @@ private fun ReminderCard(
                         label = "Until",
                         date = it,
                         icon = Icons.Default.Schedule,
-                        color = priorityColor
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
                 }
             }
@@ -420,6 +460,17 @@ private fun ReminderCard(
     }
 }
 
+private fun calculateDays(startDate: String?, endDate: String?): Int? {
+    if (startDate == null || endDate == null) return null
+    return try {
+        val start = LocalDate.parse(startDate)
+        val end = LocalDate.parse(endDate)
+        start.daysUntil(end)
+    } catch (e: Exception) {
+        null
+    }
+}
+
 @Composable
 private fun TimelineChip(
     label: String,
@@ -430,7 +481,7 @@ private fun TimelineChip(
     Surface(
         modifier = Modifier,
         shape = RoundedCornerShape(Dimens.corner_sm),
-        color = color.copy(alpha = 0.15f)
+        color = color.copy(alpha = 0.05f)
     ) {
         Row(
             modifier = Modifier.padding(
@@ -443,7 +494,7 @@ private fun TimelineChip(
                 imageVector = icon,
                 contentDescription = label,
                 tint = color,
-                modifier = Modifier.size(Dimens.icon_size_sm)
+                modifier = Modifier.size(Dimens.icon_size_xs)
             )
             Text(
                 " $label: $date",

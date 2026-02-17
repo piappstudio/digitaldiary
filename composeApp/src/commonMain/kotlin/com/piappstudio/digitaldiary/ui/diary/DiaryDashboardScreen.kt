@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -56,6 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DiaryDashboardScreen(
+    onNavigateDetail: (Long) -> Unit,
     viewModel: DiaryDashboardViewModel = koinViewModel()
 ) {
     val userEvents by viewModel.userEvents.collectAsState()
@@ -77,7 +79,10 @@ fun DiaryDashboardScreen(
         } else if (userEvents.isEmpty()) {
             EmptyEventsScreen()
         } else {
-            EventsList(events = userEvents)
+            EventsList(
+                events = userEvents,
+                onNavigateDetail = onNavigateDetail
+            )
         }
     }
 }
@@ -191,7 +196,10 @@ private fun EmptyEventsScreen() {
 }
 
 @Composable
-private fun EventsList(events: List<UserEvent>) {
+private fun EventsList(
+    events: List<UserEvent>,
+    onNavigateDetail: (Long) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -203,7 +211,10 @@ private fun EventsList(events: List<UserEvent>) {
         verticalArrangement = Arrangement.spacedBy(Dimens.bigger_space)
     ) {
         items(events) { userEvent ->
-            EventCard(userEvent = userEvent)
+            EventCard(
+                userEvent = userEvent,
+                onNavigateDetail = onNavigateDetail
+            )
         }
         item {
             Spacer(modifier = Modifier.height(Dimens.biggest_space))
@@ -212,7 +223,10 @@ private fun EventsList(events: List<UserEvent>) {
 }
 
 @Composable
-private fun EventCard(userEvent: UserEvent) {
+private fun EventCard(
+    userEvent: UserEvent,
+    onNavigateDetail: (Long) -> Unit
+) {
     var isExpanded by remember { mutableStateOf(false) }
 
     // Get emotion index for color assignment
@@ -358,27 +372,49 @@ private fun EventCard(userEvent: UserEvent) {
                 }
             }
 
-            // Expand action button (shown only when expanded)
+            // Action buttons (shown only when expanded)
             if (isExpanded) {
-                Button(
-                    onClick = { },
+                Row(
                     modifier = Modifier
-                        .align(Alignment.End)
+                        .fillMaxWidth()
                         .padding(top = Dimens.big_space),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = emotionColor
-                    ),
-                    shape = RoundedCornerShape(Dimens.corner_lg)
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit entry",
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier
-                            .size(Dimens.icon_size_sm)
-                            .padding(end = Dimens.half_space)
-                    )
-                    Text("Edit", color = MaterialTheme.colorScheme.onPrimary)
+                    Button(
+                        onClick = { onNavigateDetail(userEvent.eventInfo.eventId ?: 0L) },
+                        modifier = Modifier.padding(end = Dimens.space),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        shape = RoundedCornerShape(Dimens.corner_lg)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Visibility,
+                            contentDescription = "View detail",
+                            modifier = Modifier.size(Dimens.icon_size_sm).padding(end = Dimens.half_space)
+                        )
+                        Text("View")
+                    }
+
+                    Button(
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = emotionColor
+                        ),
+                        shape = RoundedCornerShape(Dimens.corner_lg)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit entry",
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .size(Dimens.icon_size_sm)
+                                .padding(end = Dimens.half_space)
+                        )
+                        Text("Edit", color = MaterialTheme.colorScheme.onPrimary)
+                    }
                 }
             }
         }
@@ -397,7 +433,10 @@ fun DiaryDashboardScreenPreview() {
                 .background(MaterialTheme.colorScheme.background)
         ) {
             DiaryDashboardHeader(onRefreshClick = {})
-            EventsList(events = createPreviewEvents())
+            EventsList(
+                events = createPreviewEvents(),
+                onNavigateDetail = {}
+            )
         }
     }
 }
@@ -442,7 +481,10 @@ fun EventCardPreview() {
                 .background(MaterialTheme.colorScheme.background)
                 .padding(Dimens.card_padding_lg)
         ) {
-            EventCard(userEvent = createPreviewEvent())
+            EventCard(
+                userEvent = createPreviewEvent(),
+                onNavigateDetail = {}
+            )
         }
     }
 }
@@ -529,4 +571,3 @@ private fun createPreviewEvents(): List<UserEvent> {
         )
     )
 }
-

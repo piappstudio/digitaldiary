@@ -6,56 +6,58 @@ import co.touchlab.kermit.Logger
 import com.piappstudio.digitaldiary.database.DiaryRepository
 import com.piappstudio.digitaldiary.database.entity.MediaInfo
 import com.piappstudio.digitaldiary.database.entity.UserEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class DiaryDetailViewModel(val diaryRepository: DiaryRepository) : ViewModel() {
-    private val _userEvent = MutableStateFlow<UserEvent?>(null)
-    val userEvent: StateFlow<UserEvent?> = _userEvent.asStateFlow()
+/**
+ * UI State for the Diary Detail screen.
+ */
+data class DiaryDetailUiState(
+    val userEvent: UserEvent? = null,
+    val medias: List<MediaInfo> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
 
-    private val _medias = MutableStateFlow<List<MediaInfo>>(emptyList())
-    val medias: StateFlow<List<MediaInfo>> = _medias.asStateFlow()
+class DiaryDetailViewModel(private val diaryRepository: DiaryRepository) : ViewModel() {
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    // Using a cleaner approach for State management in Kotlin 2.x
+    // Explicit backing fields (field) is a new feature that simplifies the _private / public pattern
+    val uiState: StateFlow<DiaryDetailUiState>
+        field = MutableStateFlow(DiaryDetailUiState())
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
-
-    fun loadEventDetail(eventId: Long) {
-        _isLoading.value = true
-        _error.value = null
-        viewModelScope.launch(Dispatchers.Default) {
-            try {
-                diaryRepository.getUserEvent(eventId).collect { userEvent ->
-                    _userEvent.value = userEvent
-                    Logger.d { "Event loaded: ${userEvent.eventInfo.title}" }
+    /**
+     * Consolidated loading function using combine for reactivity.
+     */
+    fun loadData(eventId: Long) {
+        uiState.update { it.copy(isLoading = true, error = null) }
+        
+        viewModelScope.launch {
+            combine(
+                diaryRepository.getUserEvent(eventId),
+                diaryRepository.getMedias(eventId)
+            ) { event, mediaList ->
+                uiState.update {
+                    it.copy(
+                        userEvent = event, 
+                        medias = mediaList, 
+                        isLoading = false,
+                        error = null
+                    ) 
                 }
-            } catch (e: Exception) {
-                Logger.e("DiaryDetailViewModel", e) { "Error loading event detail" }
-                _error.value = "Failed to load diary entry"
-            } finally {
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun loadMedias(eventId: Long) {
-        viewModelScope.launch(Dispatchers.Default) {
-            try {
-                diaryRepository.getMedias(eventId).collect { mediaList ->
-                    _medias.value = mediaList
+            }.catch { e ->
+                Logger.e("DiaryDetailViewModel", e) { "Error loading details for eventId: $eventId" }
+                uiState.update {
+                    it.copy(
+                        error = "Failed to load diary entry.", 
+                        isLoading = false 
+                    ) 
                 }
-            } catch (e: Exception) {
-                Logger.e("DiaryDetailViewModel", e) { "Error loading medias" }
-            }
+            }.collect()
         }
     }
 
     fun clearError() {
-        _error.value = null
+        uiState.update { it.copy(error = null) }
     }
 }

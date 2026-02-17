@@ -90,6 +90,10 @@ kotlin {
         }
     }
 
+    compilerOptions {
+        freeCompilerArgs.add("-Xexplicit-backing-fields")
+    }
+
     androidLibrary {
         namespace = "com.piappstudio.digitaldiary.shard"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
