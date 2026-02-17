@@ -1,5 +1,6 @@
 package com.piappstudio.digitaldiary.di
 
+import com.piappstudio.digitaldiary.ui.diary.AddDiaryViewModel
 import com.piappstudio.digitaldiary.ui.welcome.SplashViewModel
 import com.piappstudio.digitaldiary.ui.diary.DiaryDashboardViewModel
 import com.piappstudio.digitaldiary.ui.diary.detail.DiaryDetailViewModel
@@ -24,8 +25,11 @@ val viewModelModules = module {
     // DiaryRepository is automatically injected
     factoryOf(::DiaryDashboardViewModel)
     factoryOf(::DiaryDetailViewModel)
+    factoryOf(::AddDiaryViewModel)
 
     // Reminder ViewModels - Factory instances (new instance per screen)
     // ReminderRepository is automatically injected
     factoryOf(::ReminderDashboardViewModel)
+
+
 }

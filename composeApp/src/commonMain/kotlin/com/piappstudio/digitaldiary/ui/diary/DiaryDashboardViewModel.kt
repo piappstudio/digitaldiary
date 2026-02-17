@@ -35,7 +35,6 @@ class DiaryDashboardViewModel (val diaryRepository: DiaryRepository) : ViewModel
                     sortingOrder = SortingOrder.NEW
                 )
                 diaryRepository.getAllUserEvents(filterOption).collect { userEvent ->
-                    val currentList = _userEvents.value.toMutableList()
                     _userEvents.value = userEvent
                 }
             } catch (e: Exception) {
@@ -49,5 +48,18 @@ class DiaryDashboardViewModel (val diaryRepository: DiaryRepository) : ViewModel
     fun refreshEvents() {
         _userEvents.value = emptyList()
         loadEvents()
+    }
+
+    fun deleteEvent(eventId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                diaryRepository.delete(eventId)
+                // The flow will automatically update if the repository handles it, 
+                // but since we collect manually in loadEvents, we might need a refresh or 
+                // the collect will catch the change if the DAO flow is live.
+            } catch (e: Exception) {
+                Logger.e("DiaryDashboardViewModel", e) { "Error deleting event: $eventId" }
+            }
+        }
     }
 }

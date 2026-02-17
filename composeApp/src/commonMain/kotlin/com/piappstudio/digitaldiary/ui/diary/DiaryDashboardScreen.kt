@@ -3,6 +3,7 @@ package com.piappstudio.digitaldiary.ui.diary
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,18 +16,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,12 +43,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.piappstudio.digitaldiary.common.theme.DiaryMood
+import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
 import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
-import androidx.compose.ui.tooling.preview.Preview
-import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
-import com.piappstudio.digitaldiary.common.theme.DiaryMood
 import com.piappstudio.digitaldiary.database.entity.EventInfo
 import com.piappstudio.digitaldiary.database.entity.MediaInfo
 import com.piappstudio.digitaldiary.database.entity.TagInfo
@@ -81,7 +81,8 @@ fun DiaryDashboardScreen(
         } else {
             EventsList(
                 events = userEvents,
-                onNavigateDetail = onNavigateDetail
+                onNavigateEdit = onNavigateDetail,
+                onDelete = { viewModel.deleteEvent(it) }
             )
         }
     }
@@ -95,11 +96,7 @@ private fun DiaryDashboardHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(
-                    bottomStart = Dimens.corner_2xl,
-                    bottomEnd = Dimens.corner_2xl
-                )
+                MaterialTheme.colorScheme.secondary
             )
             .padding(Dimens.card_padding_lg)
     ) {
@@ -198,7 +195,8 @@ private fun EmptyEventsScreen() {
 @Composable
 private fun EventsList(
     events: List<UserEvent>,
-    onNavigateDetail: (Long) -> Unit
+    onNavigateEdit: (Long) -> Unit,
+    onDelete: (Long) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -213,7 +211,9 @@ private fun EventsList(
         items(events) { userEvent ->
             EventCard(
                 userEvent = userEvent,
-                onNavigateDetail = onNavigateDetail
+                onClick = { onNavigateEdit(userEvent.eventInfo.eventId ?: 0L) },
+                onDelete = { onDelete(userEvent.eventInfo.eventId ?: 0L) },
+                onShare = { /* Handle share */ }
             )
         }
         item {
@@ -225,9 +225,11 @@ private fun EventsList(
 @Composable
 private fun EventCard(
     userEvent: UserEvent,
-    onNavigateDetail: (Long) -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    onShare: () -> Unit
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
     // Get emotion index for color assignment
     val emotionIndex = userEvent.eventInfo.emotion.hashCode().rem(6).coerceAtLeast(0)
@@ -238,17 +240,17 @@ private fun EventCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .animateContentSize().
-                clip(cardShape)
+            .animateContentSize()
+            .clip(cardShape)
             .shadow(
                 elevation = 8.dp,
-        shape = cardShape,
-        clip = false
-    )
+                shape = cardShape,
+                clip = false
+            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = { isExpanded = !isExpanded }
+                onClick = onClick
             ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -294,16 +296,44 @@ private fun EventCard(
                     )
                 }
 
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.size(Dimens.icon_size_lg)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options",
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(Dimens.icon_size_md)
-                    )
+                Box {
+                    IconButton(
+                        onClick = { showMenu = true },
+                        modifier = Modifier.size(Dimens.icon_size_lg)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(Dimens.icon_size_md)
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                onDelete()
+                                showMenu = false
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Delete, contentDescription = null)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Share") },
+                            onClick = {
+                                onShare()
+                                showMenu = false
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Share, contentDescription = null)
+                            }
+                        )
+                    }
                 }
             }
 
@@ -313,7 +343,7 @@ private fun EventCard(
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = Dimens.space),
-                maxLines = if (isExpanded) Int.MAX_VALUE else 2,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -323,7 +353,7 @@ private fun EventCard(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 modifier = Modifier.padding(bottom = Dimens.space),
-                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -371,52 +401,6 @@ private fun EventCard(
                     )
                 }
             }
-
-            // Action buttons (shown only when expanded)
-            if (isExpanded) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = Dimens.big_space),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(
-                        onClick = { onNavigateDetail(userEvent.eventInfo.eventId ?: 0L) },
-                        modifier = Modifier.padding(end = Dimens.space),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                        ),
-                        shape = RoundedCornerShape(Dimens.corner_lg)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Visibility,
-                            contentDescription = "View detail",
-                            modifier = Modifier.size(Dimens.icon_size_sm).padding(end = Dimens.half_space)
-                        )
-                        Text("View")
-                    }
-
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = emotionColor
-                        ),
-                        shape = RoundedCornerShape(Dimens.corner_lg)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit entry",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier
-                                .size(Dimens.icon_size_sm)
-                                .padding(end = Dimens.half_space)
-                        )
-                        Text("Edit", color = MaterialTheme.colorScheme.onPrimary)
-                    }
-                }
-            }
         }
     }
 }
@@ -435,7 +419,8 @@ fun DiaryDashboardScreenPreview() {
             DiaryDashboardHeader(onRefreshClick = {})
             EventsList(
                 events = createPreviewEvents(),
-                onNavigateDetail = {}
+                onNavigateEdit = {},
+                onDelete = {}
             )
         }
     }
@@ -483,7 +468,9 @@ fun EventCardPreview() {
         ) {
             EventCard(
                 userEvent = createPreviewEvent(),
-                onNavigateDetail = {}
+                onClick = {},
+                onDelete = {},
+                onShare = {}
             )
         }
     }

@@ -18,6 +18,9 @@ sealed interface PiRoute: NavKey {
     data class DiaryDetail(val eventId: Long) : PiRoute
 
     @Serializable
+    data class AddDiary(val eventId: Long? = null) : PiRoute
+
+    @Serializable
     data object Reminder : PiRoute
     @Serializable
     data object Settings : PiRoute
@@ -30,6 +33,7 @@ val config = SavedStateConfiguration {
         polymorphic(NavKey::class) {
             subclass(PiRoute.Diary::class, PiRoute.Diary.serializer())
             subclass(PiRoute.DiaryDetail::class, PiRoute.DiaryDetail.serializer())
+            subclass(PiRoute.AddDiary::class, PiRoute.AddDiary.serializer())
             subclass(PiRoute.Reminder::class, PiRoute.Reminder.serializer())
             subclass(PiRoute.Settings::class, PiRoute.Settings.serializer())
             subclass(PiRoute.Splash::class, PiRoute.Splash.serializer())

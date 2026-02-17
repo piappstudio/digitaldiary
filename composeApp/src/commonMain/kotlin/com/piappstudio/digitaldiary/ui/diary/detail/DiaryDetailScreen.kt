@@ -49,6 +49,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun DiaryDetailScreen(
     eventId: Long,
     onBackClick: () -> Unit,
+    onNavigateEdit: (Long) -> Unit,
     viewModel: DiaryDetailViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -74,7 +75,7 @@ fun DiaryDetailScreen(
             userEvent = userEvent,
             medias = medias,
             onBackClick = onBackClick,
-            onEdit = { },
+            onEdit = { onNavigateEdit(eventId) },
             onDelete = { }
         )
     } else {

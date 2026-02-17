@@ -2,6 +2,7 @@ package com.piappstudio.digitaldiary.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.dp
 
 enum class WindowType {
     Compact,
@@ -11,10 +12,10 @@ enum class WindowType {
 
 @Composable
 fun rememberWindowType(): WindowType {
-    val width = LocalWindowInfo.current.containerSize.width
+    val width = LocalWindowInfo.current.containerDpSize.width
     return when {
-        width < 600 -> WindowType.Compact
-        width < 840 -> WindowType.Medium
+        width < 600.dp -> WindowType.Compact
+        width < 840.dp -> WindowType.Medium
         else -> WindowType.Expanded
     }
 }
