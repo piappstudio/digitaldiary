@@ -1,5 +1,6 @@
-package com.piappstudio.digitaldiary.ui.diary
+package com.piappstudio.digitaldiary.ui.diary.edit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -49,6 +50,7 @@ fun AddDiaryScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
                 actions = {
                     if (uiState.isSaving) {
                         CircularProgressIndicator(
@@ -138,7 +140,7 @@ fun EmotionPicker(
                     .clip(RoundedCornerShape(Dimens.corner_full))
                     .clickable { onEmotionSelected(emotion) },
                 color = if (isSelected) emotionColor else emotionColor.copy(alpha = 0.1f),
-                border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, emotionColor.copy(alpha = 0.5f))
+                border = if (isSelected) null else BorderStroke(1.dp, emotionColor.copy(alpha = 0.5f))
             ) {
                 Text(
                     text = emotion,

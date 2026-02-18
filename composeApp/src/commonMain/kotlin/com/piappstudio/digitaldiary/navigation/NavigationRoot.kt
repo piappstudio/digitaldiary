@@ -18,10 +18,12 @@ import com.piappstudio.digitaldiary.common.WindowType
 import com.piappstudio.digitaldiary.common.rememberWindowType
 import com.piappstudio.digitaldiary.navigation.appbar.PiAppBottomBar
 import com.piappstudio.digitaldiary.navigation.appbar.PiAppNavigationRail
-import com.piappstudio.digitaldiary.ui.diary.AddDiaryScreen
+import com.piappstudio.digitaldiary.ui.diary.edit.AddDiaryScreen
 import com.piappstudio.digitaldiary.ui.diary.DiaryDashboardScreen
 import com.piappstudio.digitaldiary.ui.diary.detail.DiaryDetailScreen
 import com.piappstudio.digitaldiary.ui.reminder.ReminderDashboardScreen
+import com.piappstudio.digitaldiary.ui.reminder.detail.ReminderDetailScreen
+import com.piappstudio.digitaldiary.ui.reminder.edit.AddReminderScreen
 import com.piappstudio.digitaldiary.ui.setting.SettingsDashboardScreen
 import com.piappstudio.digitaldiary.ui.welcome.SplashScreen
 
@@ -37,7 +39,8 @@ fun SetUpNavigationRoot() {
     Scaffold (bottomBar = {
         if (!useRail) {
             PiAppBottomBar(backStack = appBackStack)
-        } }) {
+        }
+    },  contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)) {
 
         Row (modifier = Modifier.padding(it)) {
             if (useRail) {
@@ -67,8 +70,30 @@ fun SetUpNavigationRoot() {
                         )
                     }
                     entry<PiRoute.Reminder> {
-                        ReminderDashboardScreen()
+                        ReminderDashboardScreen(
+                            onNavigateDetail = { reminderId ->
+                                appBackStack.add(PiRoute.ReminderDetail(reminderId))
+                            },
+                            onNavigateAdd = {
+                                appBackStack.add(PiRoute.AddReminder())
+                            }
+                        )
 
+                    }
+                    entry<PiRoute.ReminderDetail> { route ->
+                        ReminderDetailScreen(
+                            reminderId = route.reminderId,
+                            onBackClick = { appBackStack.removeLast() },
+                            onNavigateEdit = { reminderId ->
+                                appBackStack.add(PiRoute.AddReminder(reminderId))
+                            }
+                        )
+                    }
+                    entry<PiRoute.AddReminder> { route ->
+                        AddReminderScreen(
+                            reminderId = route.reminderId,
+                            onBack = { appBackStack.removeLast() }
+                        )
                     }
                     entry<PiRoute.Settings> {
                         SettingsDashboardScreen()

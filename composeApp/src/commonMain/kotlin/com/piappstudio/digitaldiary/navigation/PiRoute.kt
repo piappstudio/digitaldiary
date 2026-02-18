@@ -22,6 +22,13 @@ sealed interface PiRoute: NavKey {
 
     @Serializable
     data object Reminder : PiRoute
+
+    @Serializable
+    data class ReminderDetail(val reminderId: Long) : PiRoute
+
+    @Serializable
+    data class AddReminder(val reminderId: Long? = null) : PiRoute
+
     @Serializable
     data object Settings : PiRoute
 }
@@ -35,6 +42,8 @@ val config = SavedStateConfiguration {
             subclass(PiRoute.DiaryDetail::class, PiRoute.DiaryDetail.serializer())
             subclass(PiRoute.AddDiary::class, PiRoute.AddDiary.serializer())
             subclass(PiRoute.Reminder::class, PiRoute.Reminder.serializer())
+            subclass(PiRoute.ReminderDetail::class, PiRoute.ReminderDetail.serializer())
+            subclass(PiRoute.AddReminder::class, PiRoute.AddReminder.serializer())
             subclass(PiRoute.Settings::class, PiRoute.Settings.serializer())
             subclass(PiRoute.Splash::class, PiRoute.Splash.serializer())
         }
