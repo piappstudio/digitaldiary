@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
+import kotlinx.datetime.toLocalDateTime
 
 class ReminderDashboardViewModel(val reminderRepository: ReminderRepository) : ViewModel() {
     private val _reminders = MutableStateFlow<List<ReminderEvent>>(emptyList())
@@ -76,14 +81,27 @@ enum class ReminderPriority(val label: String) {
     LOW("🔵 Low")
 }
 
-fun determinePriority(endDate: String?): ReminderPriority {
-    if (endDate == null) return ReminderPriority.LOW
-    // Simple logic - can be enhanced based on actual date comparison
-    return when {
-        endDate.contains("2026-02-1") && endDate.contains("6") || endDate.contains("7") -> ReminderPriority.URGENT
-        endDate.contains("2026-02") -> ReminderPriority.HIGH
-        endDate.contains("2026-03") -> ReminderPriority.MEDIUM
-        else -> ReminderPriority.LOW
+fun calculateDaysRemaining(endDate: String?): Int? {
+    if (endDate == null) return null
+    return try {
+        val end = LocalDate.parse(endDate)
+        // Explicitly using kotlinx.datetime.Clock to avoid conflict with kotlin.time.Clock
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        now.daysUntil(end)
+    } catch (e: Exception) {
+        Logger.e(e) { "Error calculating days remaining: ${e.message}" }
+        null
     }
 }
 
+fun determinePriority(endDate: String?): ReminderPriority {
+    val daysRemaining = calculateDaysRemaining(endDate) ?: return ReminderPriority.LOW
+
+    return when {
+        daysRemaining < 0 -> ReminderPriority.LOW // Already passed
+        daysRemaining <= 3 -> ReminderPriority.URGENT
+        daysRemaining <= 7 -> ReminderPriority.HIGH
+        daysRemaining <= 15 -> ReminderPriority.MEDIUM
+        else -> ReminderPriority.LOW
+    }
+}

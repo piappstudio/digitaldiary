@@ -20,8 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Timer
@@ -51,18 +49,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.piappstudio.digitaldiary.common.theme.Dimens
-import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
-import com.piappstudio.digitaldiary.common.theme.DiaryMood
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
 import com.piappstudio.digitaldiary.database.entity.ReminderEvent
-import com.piappstudio.digitaldiary.database.entity.ReminderInfo
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.daysUntil
 import org.koin.compose.viewmodel.koinViewModel
-
 
 @Composable
 fun ReminderDashboardScreen(
@@ -310,7 +301,7 @@ private fun ReminderCard(
                 }
             }
 
-            // Title and Duration
+            // Title and Days Remaining
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -327,9 +318,10 @@ private fun ReminderCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                // Days Available calculation (Compact view)
-                val daysAvailable = calculateDays(reminderEvent.reminderInfo.startDate, reminderEvent.reminderInfo.endDate)
-                if (daysAvailable != null) {
+                // Display days remaining based on end date
+                val daysRemaining = calculateDaysRemaining(reminderEvent.reminderInfo.endDate)
+                if (daysRemaining != null) {
+                    val displayValue = if (daysRemaining < 0) "Past" else "${daysRemaining}d Left"
                     Surface(
                         shape = RoundedCornerShape(Dimens.corner_full),
                         color = priorityColor.copy(alpha = 0.1f),
@@ -346,7 +338,7 @@ private fun ReminderCard(
                                 modifier = Modifier.size(Dimens.icon_size_xs)
                             )
                             Text(
-                                " ${daysAvailable}d",
+                                " $displayValue",
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = priorityColor
@@ -429,17 +421,6 @@ private fun ReminderCard(
     }
 }
 
-private fun calculateDays(startDate: String?, endDate: String?): Int? {
-    if (startDate == null || endDate == null) return null
-    return try {
-        val start = LocalDate.parse(startDate)
-        val end = LocalDate.parse(endDate)
-        start.daysUntil(end)
-    } catch (e: Exception) {
-        null
-    }
-}
-
 @Composable
 private fun TimelineChip(
     label: String,
@@ -473,42 +454,4 @@ private fun TimelineChip(
             )
         }
     }
-}
-
-// ============ PREVIEW COMPOSABLES ============
-
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
-@Composable
-fun ReminderDashboardScreenPreview() {
-    DigitalDiaryTheme(diaryMood = DiaryMood.PASSIONATE) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            ReminderDashboardHeader(onRefreshClick = {})
-            RemindersList(
-                reminders = createPreviewReminders(),
-                onReminderClick = {},
-                onDeleteReminder = {}
-            )
-        }
-    }
-}
-
-// ... rest of the preview functions and data can remain same or be adjusted if needed ...
-private fun createPreviewReminders(): List<ReminderEvent> {
-    return listOf(
-        ReminderEvent(
-            reminderInfo = ReminderInfo(
-                reminderId = 1L,
-                title = "Team Meeting",
-                description = "Important quarterly planning meeting with the entire team.",
-                startDate = "2026-02-16",
-                endDate = "2026-02-16",
-                isReminderRequired = true,
-                remindBefore = 30
-            )
-        )
-    )
 }
