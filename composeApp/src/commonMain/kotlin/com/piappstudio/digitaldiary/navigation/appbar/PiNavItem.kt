@@ -12,15 +12,15 @@ data class PiNavItem(
 )
 
 val bottomNavItems =  mapOf(
-    PiRoute.Diary to PiNavItem(
+    PiRoute.BottomBar.Diary to PiNavItem(
         icon = Icons.Default.Event,
         title = "Diary"
     ),
-    PiRoute.Reminder to PiNavItem(
+    PiRoute.BottomBar.Reminder to PiNavItem(
         icon = Icons.Default.Timeline,
         title = "Reminder"
     ),
-    PiRoute.Settings to PiNavItem(
+    PiRoute.BottomBar.Settings to PiNavItem(
         icon = Icons.Default.Settings,
         title = "Settings"
     )

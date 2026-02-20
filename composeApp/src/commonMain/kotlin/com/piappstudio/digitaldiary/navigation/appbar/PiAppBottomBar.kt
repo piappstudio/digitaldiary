@@ -15,7 +15,11 @@ import androidx.navigation3.runtime.NavKey
 import com.piappstudio.digitaldiary.common.theme.Dimens
 
 fun NavBackStack<NavKey>.navigateSingleTop(route: NavKey) {
-    clear()
+    if (lastOrNull() != route) {
+        if (lastOrNull() in bottomNavItems) {
+            removeAt(lastIndex)
+        }
+    }
     add(route)
 }
 
