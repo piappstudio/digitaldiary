@@ -51,6 +51,7 @@ val config = SavedStateConfiguration {
             subclass(PiRoute.ReminderDetail::class, PiRoute.ReminderDetail.serializer())
             subclass(PiRoute.AddReminder::class, PiRoute.AddReminder.serializer())
             subclass(PiRoute.Splash::class, PiRoute.Splash.serializer())
+            subclass(PiRoute.BottomBarScreen::class, PiRoute.BottomBarScreen.serializer())
         }
     }
 }

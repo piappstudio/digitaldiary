@@ -91,7 +91,7 @@ kotlin {
     }
 
     compilerOptions {
-        freeCompilerArgs.add("-Xexplicit-backing-fields")
+        freeCompilerArgs.addAll("-Xexplicit-backing-fields", "-Xskip-prerelease-check")
     }
 
     androidLibrary {
@@ -99,6 +99,7 @@ kotlin {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.add("-Xskip-prerelease-check")
         }
 
         androidResources {

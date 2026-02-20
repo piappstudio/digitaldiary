@@ -13,11 +13,6 @@ plugins {
 }
 
 kotlin {
-    target {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
     dependencies {
 
         implementation(projects.composeApp)
@@ -47,6 +42,11 @@ kotlin {
             resources {
                 excludes += "/META-INF/{AL2.0,LGPL2.1}"
             }
+        }
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+            freeCompilerArgs.add("-Xskip-prerelease-check")
         }
 
         buildTypes {
