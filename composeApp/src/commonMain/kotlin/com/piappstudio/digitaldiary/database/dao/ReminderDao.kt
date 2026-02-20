@@ -22,19 +22,19 @@ interface ReminderDao {
 
     @Transaction
     @Query("SELECT * FROM reminder_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY title ASC")
-    fun getRemindersByAZ(search: String): Flow<ReminderEvent>
+    fun getRemindersByAZ(search: String): Flow<List<ReminderEvent>>
 
     @Transaction
     @Query("SELECT * FROM reminder_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY title DESC")
-    fun getRemindersByZA(search: String): Flow<ReminderEvent>
+    fun getRemindersByZA(search: String): Flow<List<ReminderEvent>>
 
     @Transaction
     @Query("SELECT * FROM reminder_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY strftime('%Y-%m-%d %H:%M', endDate) DESC")
-    fun getRemindersByEndDateDES(search: String): Flow<ReminderEvent>
+    fun getRemindersByEndDateDES(search: String): Flow<List<ReminderEvent>>
 
     @Transaction
     @Query("SELECT * FROM reminder_table WHERE title LIKE '%' ||:search ||'%' OR description LIKE '%'|| :search ||'%' ORDER BY strftime('%Y-%m-%d %H:%M', endDate) ASC")
-    fun getRemindersByEndDateASC(search: String): Flow<ReminderEvent>
+    fun getRemindersByEndDateASC(search: String): Flow<List<ReminderEvent>>
 
 
     @Query("SELECT * FROM reminder_table")
