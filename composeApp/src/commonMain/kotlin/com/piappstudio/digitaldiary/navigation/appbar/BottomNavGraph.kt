@@ -31,7 +31,6 @@ fun BottomNavGraph(appNavBackStack: NavBackStack<NavKey>) {
     val windowType = rememberWindowType()
     val useRail = windowType != WindowType.Compact
 
-
     Scaffold (bottomBar = {
         if (!useRail) {
             PiAppBottomBar(backStack = bottomNavBackStack)

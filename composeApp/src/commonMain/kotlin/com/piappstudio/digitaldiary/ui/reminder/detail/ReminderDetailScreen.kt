@@ -6,18 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -28,7 +24,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,10 +37,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
 import com.piappstudio.digitaldiary.database.entity.ReminderEvent
+import com.piappstudio.digitaldiary.ui.component.PiActionIcon
+import com.piappstudio.digitaldiary.ui.component.PiHeader
 import com.piappstudio.digitaldiary.ui.reminder.determinePriority
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -109,12 +105,22 @@ private fun DetailContent(
             .background(MaterialTheme.colorScheme.background)
     ) {
         item {
-            DetailHeader(
+            PiHeader(
                 title = "Reminder Details",
                 backgroundColor = priorityColor,
                 onBackClick = onBackClick,
-                onEdit = onEdit,
-                onDelete = { showDeleteDialog = true }
+                actions = {
+                    PiActionIcon(
+                        icon = Icons.Default.Edit,
+                        onClick = onEdit,
+                        contentDescription = "Edit"
+                    )
+                    PiActionIcon(
+                        icon = Icons.Default.Delete,
+                        onClick = { showDeleteDialog = true },
+                        contentDescription = "Delete"
+                    )
+                }
             )
         }
 
@@ -251,44 +257,6 @@ private fun DetailContent(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun DetailHeader(
-    title: String,
-    backgroundColor: androidx.compose.ui.graphics.Color,
-    onBackClick: () -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(top = statusBarPadding.calculateTopPadding())
-            .padding(Dimens.card_padding_lg)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onPrimary)
-            }
-            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimary)
-            Row {
-                IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.onPrimary)
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.onPrimary)
-                }
-            }
-        }
     }
 }
 

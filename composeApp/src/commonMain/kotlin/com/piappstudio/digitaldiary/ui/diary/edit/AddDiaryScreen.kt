@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,9 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
+import com.piappstudio.digitaldiary.ui.component.PiActionIcon
+import com.piappstudio.digitaldiary.ui.component.PiHeader
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddDiaryScreen(
     eventId: Long? = null,
@@ -41,77 +42,75 @@ fun AddDiaryScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(if (eventId == null) "New Entry" else "Edit Entry") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+    val colorIndex = uiState.emotion.hashCode().rem(6).coerceAtLeast(0)
+    val emotionColor = getTemplateColor(colorIndex)
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            PiHeader(
+                title = if (eventId == null) "New Entry" else "Edit Entry",
+                onBackClick = onBack,
+                backgroundColor = emotionColor,
                 actions = {
-                    if (uiState.isSaving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    } else {
-                        IconButton(onClick = { viewModel.saveEntry() }) {
-                            Icon(Icons.Default.Check, contentDescription = "Save")
-                        }
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(Dimens.card_padding_lg)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(Dimens.bigger_space)
-            ) {
-                if (uiState.error != null) {
-                    Text(
-                        text = uiState.error ?: "",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
+                    PiActionIcon(
+                        icon = Icons.Default.Check,
+                        onClick = { viewModel.saveEntry() },
+                        isLoading = uiState.isSaving,
+                        contentDescription = "Save"
                     )
                 }
+            )
 
-                OutlinedTextField(
-                    value = uiState.title,
-                    onValueChange = { viewModel.onTitleChange(it) },
-                    label = { Text("Title") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-
-                OutlinedTextField(
-                    value = uiState.description,
-                    onValueChange = { viewModel.onDescriptionChange(it) },
-                    label = { Text("Description") },
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 150.dp),
-                    minLines = 5
-                )
+                        .fillMaxSize()
+                        .padding(Dimens.card_padding_lg)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.bigger_space)
+                ) {
+                    if (uiState.error != null) {
+                        Text(
+                            text = uiState.error ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
 
-                Text("How are you feeling?", style = MaterialTheme.typography.titleMedium)
+                    OutlinedTextField(
+                        value = uiState.title,
+                        onValueChange = { viewModel.onTitleChange(it) },
+                        label = { Text("Title") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
 
-                EmotionPicker(
-                    selectedEmotion = uiState.emotion,
-                    onEmotionSelected = { viewModel.onEmotionChange(it) }
-                )
+                    OutlinedTextField(
+                        value = uiState.description,
+                        onValueChange = { viewModel.onDescriptionChange(it) },
+                        label = { Text("Description") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 150.dp),
+                        minLines = 5
+                    )
+
+                    Text("How are you feeling?", style = MaterialTheme.typography.titleMedium)
+
+                    EmotionPicker(
+                        selectedEmotion = uiState.emotion,
+                        onEmotionSelected = { viewModel.onEmotionChange(it) }
+                    )
+                }
             }
         }
     }
