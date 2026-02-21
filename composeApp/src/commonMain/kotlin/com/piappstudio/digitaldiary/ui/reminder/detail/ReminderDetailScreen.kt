@@ -42,6 +42,7 @@ import com.piappstudio.digitaldiary.common.theme.getTemplateColor
 import com.piappstudio.digitaldiary.database.entity.ReminderEvent
 import com.piappstudio.digitaldiary.ui.component.PiActionIcon
 import com.piappstudio.digitaldiary.ui.component.PiHeader
+import com.piappstudio.digitaldiary.ui.diary.component.PiConfirmationAlertDialog
 import com.piappstudio.digitaldiary.ui.reminder.determinePriority
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -107,7 +108,6 @@ private fun DetailContent(
         item {
             PiHeader(
                 title = "Reminder Details",
-                backgroundColor = priorityColor,
                 onBackClick = onBackClick,
                 actions = {
                     PiActionIcon(
@@ -198,10 +198,20 @@ private fun DetailContent(
                 )
 
                 reminderEvent.reminderInfo.startDate?.let {
-                    TimelineInfoRow(label = "Start Date", value = it, icon = Icons.Default.DateRange, color = priorityColor)
+                    TimelineInfoRow(
+                        label = "Start Date",
+                        value = it,
+                        icon = Icons.Default.DateRange,
+                        color = priorityColor
+                    )
                 }
                 reminderEvent.reminderInfo.endDate?.let {
-                    TimelineInfoRow(label = "End Date", value = it, icon = Icons.Default.Schedule, color = priorityColor)
+                    TimelineInfoRow(
+                        label = "End Date",
+                        value = it,
+                        icon = Icons.Default.Schedule,
+                        color = priorityColor
+                    )
                 }
 
                 if (reminderEvent.reminderInfo.isReminderRequired) {
@@ -236,35 +246,36 @@ private fun DetailContent(
     }
 
     if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Reminder") },
-            text = { Text("Are you sure you want to delete this reminder?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onDelete()
-                        showDeleteDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
+        PiConfirmationAlertDialog(
+            title = "Delete Reminder",
+            message = "Are you sure you want to delete this reminder?",
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                onDelete()
+                showDeleteDialog = false
+            })
     }
 }
 
 @Composable
-private fun TimelineInfoRow(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, color: androidx.compose.ui.graphics.Color) {
+private fun TimelineInfoRow(
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    color: androidx.compose.ui.graphics.Color
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(Dimens.icon_size_sm))
-        Text("  $label: ", style = MaterialTheme.typography.bodyMedium, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = color,
+            modifier = Modifier.size(Dimens.icon_size_sm)
+        )
+        Text(
+            "  $label: ",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+        )
         Text(value, style = MaterialTheme.typography.bodyMedium)
     }
 }

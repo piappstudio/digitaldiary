@@ -49,7 +49,6 @@
 		18220D6F2F39842C00113510 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/CoreFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		18220D712F39844700113510 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		18220D742F398AD600113510 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		187F862C2F3A6E35002D1BF3 /* ComposeApp.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ComposeApp.framework; path = "../composeApp/build/xcode-frameworks/Debug/iphonesimulator17.2/ComposeApp.framework"; sourceTree = "<group>"; };
 		187F862F2F3A6EC4002D1BF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -141,7 +140,6 @@
 		18220D6E2F39842C00113510 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				187F862C2F3A6E35002D1BF3 /* ComposeApp.framework */,
 				18220D712F39844700113510 /* UIKit.framework */,
 				18220D6F2F39842C00113510 /* CoreFoundation.framework */,
 			);

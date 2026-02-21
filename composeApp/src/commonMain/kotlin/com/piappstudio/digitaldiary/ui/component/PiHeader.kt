@@ -17,9 +17,11 @@ import com.piappstudio.digitaldiary.common.theme.Dimens
 @Composable
 fun PiHeader(
     title: String,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.primary,
+    subtitle: String? = null,
+    onBackClick: (() -> Unit)? = null,
+    backgroundColor: Color = Color.Transparent,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
@@ -32,33 +34,49 @@ fun PiHeader(
             .padding(horizontal = Dimens.card_padding_lg, vertical = Dimens.space)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = onBackClick,
-                modifier = Modifier.size(Dimens.icon_size_lg)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(Dimens.icon_size_md)
-                )
+            if (onBackClick != null) {
+                IconButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.size(Dimens.icon_size_lg)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = contentColor,
+                        modifier = Modifier.size(Dimens.icon_size_md)
+                    )
+                }
             }
 
-            Text(
-                title,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center
-            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = if (onBackClick != null) Dimens.space else 0.dp),
+                horizontalAlignment = if (onBackClick != null && subtitle == null) Alignment.CenterHorizontally else Alignment.Start
+            ) {
+                Text(
+                    title,
+                    style = if (subtitle != null) MaterialTheme.typography.headlineLarge else MaterialTheme.typography.titleMedium,
+                    color = contentColor,
+                    textAlign = if (onBackClick != null && subtitle == null) TextAlign.Center else TextAlign.Start,
+                    modifier = if (onBackClick != null && subtitle == null) Modifier.fillMaxWidth() else Modifier
+                )
+                if (subtitle != null) {
+                    Text(
+                        subtitle,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = contentColor.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Start
+                    )
+                }
+            }
 
             Row(
-                modifier = Modifier.widthIn(min = Dimens.icon_size_lg),
+                modifier = Modifier.widthIn(min = if (onBackClick == null && subtitle == null) 0.dp else Dimens.icon_size_lg),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -73,7 +91,8 @@ fun RowScope.PiActionIcon(
     icon: ImageVector,
     onClick: () -> Unit,
     contentDescription: String? = null,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    tint: Color = MaterialTheme.colorScheme.onSurface
 ) {
     if (isLoading) {
         Box(
@@ -83,7 +102,7 @@ fun RowScope.PiActionIcon(
             CircularProgressIndicator(
                 modifier = Modifier.size(Dimens.icon_size_sm),
                 strokeWidth = 2.dp,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = tint
             )
         }
     } else {
@@ -94,8 +113,8 @@ fun RowScope.PiActionIcon(
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(Dimens.icon_size_sm)
+                tint = tint,
+                modifier = Modifier.size(Dimens.icon_size_md)
             )
         }
     }

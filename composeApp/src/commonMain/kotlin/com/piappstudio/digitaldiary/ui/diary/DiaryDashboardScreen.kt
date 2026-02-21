@@ -10,17 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
@@ -30,9 +29,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,97 +47,65 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.piappstudio.digitaldiary.common.theme.DiaryMood
-import com.piappstudio.digitaldiary.common.theme.DigitalDiaryTheme
 import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
-import com.piappstudio.digitaldiary.database.entity.EventInfo
-import com.piappstudio.digitaldiary.database.entity.MediaInfo
-import com.piappstudio.digitaldiary.database.entity.TagInfo
 import com.piappstudio.digitaldiary.database.entity.UserEvent
+import com.piappstudio.digitaldiary.ui.component.PiActionIcon
+import com.piappstudio.digitaldiary.ui.component.PiHeader
+import com.piappstudio.digitaldiary.ui.diary.component.PiConfirmationAlertDialog
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DiaryDashboardScreen(
     onNavigateDetail: (Long) -> Unit,
+    onNavigateAdd: () -> Unit,
     viewModel: DiaryDashboardViewModel = koinViewModel()
 ) {
     val userEvents by viewModel.userEvents.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        // Header Section with Title and Refresh Button
-        DiaryDashboardHeader(
-            onRefreshClick = { viewModel.refreshEvents() }
-        )
-
-        // Content Section - Events List or Empty State
-        if (isLoading && userEvents.isEmpty()) {
-            LoadingScreen()
-        } else if (userEvents.isEmpty()) {
-            EmptyEventsScreen()
-        } else {
-            EventsList(
-                events = userEvents,
-                onNavigateEdit = onNavigateDetail,
-                onDelete = { viewModel.deleteEvent(it) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun DiaryDashboardHeader(
-    onRefreshClick: () -> Unit
-) {
-    val statusBarPadding = WindowInsets.statusBars.asPaddingValues()
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.primary
-            )
-            .padding(top = statusBarPadding.calculateTopPadding())
-            .padding(Dimens.card_padding_lg)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNavigateAdd,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Text(
-                    "My Diary",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(bottom = Dimens.half_space)
-                )
-                Text(
-                    "Your daily moments and thoughts",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-                )
+                Icon(Icons.Default.Add, contentDescription = "Add Diary Entry")
             }
+        },
+        contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            // Using the common PiHeader
+            PiHeader(
+                title = "My Diary",
+                subtitle = "Your daily moments and thoughts",
+                actions = {
+                    PiActionIcon(
+                        icon = Icons.Default.Refresh,
+                        onClick = { viewModel.refreshEvents() },
+                        contentDescription = "Refresh events"
+                    )
+                }
+            )
 
-            IconButton(
-                onClick = onRefreshClick,
-                modifier = Modifier.size(Dimens.icon_size_lg)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh events",
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(Dimens.icon_size_md)
+            // Content Section - Events List or Empty State
+            if (isLoading && userEvents.isEmpty()) {
+                LoadingScreen()
+            } else if (userEvents.isEmpty()) {
+                EmptyEventsScreen()
+            } else {
+                EventsList(
+                    events = userEvents,
+                    onNavigateEdit = onNavigateDetail,
+                    onDelete = { viewModel.deleteEvent(it) }
                 )
             }
         }
@@ -167,16 +136,16 @@ private fun EmptyEventsScreen() {
             .padding(Dimens.card_padding_lg),
         contentAlignment = Alignment.Center
     ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(Dimens.corner_2xl)
-                    )
-                    .padding(Dimens.card_padding_lg)
-            ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(Dimens.corner_2xl)
+                )
+                .padding(Dimens.card_padding_lg)
+        ) {
             Text(
                 "📝",
                 style = MaterialTheme.typography.headlineLarge,
@@ -209,7 +178,7 @@ private fun EventsList(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(
-                horizontal = Dimens.card_padding_lg,
+                horizontal = Dimens.card_padding_md,
                 vertical = Dimens.card_padding_md
             ),
         verticalArrangement = Arrangement.spacedBy(Dimens.bigger_space)
@@ -236,6 +205,7 @@ private fun EventCard(
     onShare: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Get emotion index for color assignment
     val emotionIndex = userEvent.eventInfo.emotion.hashCode().rem(6).coerceAtLeast(0)
@@ -322,7 +292,7 @@ private fun EventCard(
                         DropdownMenuItem(
                             text = { Text("Delete") },
                             onClick = {
-                                onDelete()
+                                showDeleteDialog = true
                                 showMenu = false
                             },
                             leadingIcon = {
@@ -409,158 +379,16 @@ private fun EventCard(
             }
         }
     }
-}
 
-// ============ PREVIEW COMPOSABLES ============
-
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
-@Composable
-fun DiaryDashboardScreenPreview() {
-    DigitalDiaryTheme(diaryMood = DiaryMood.PASSIONATE) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            DiaryDashboardHeader(onRefreshClick = {})
-            EventsList(
-                events = createPreviewEvents(),
-                onNavigateEdit = {},
-                onDelete = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
-@Composable
-fun DiaryDashboardEmptyStatePreview() {
-    DigitalDiaryTheme(diaryMood = DiaryMood.PASSIONATE) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            DiaryDashboardHeader(onRefreshClick = {})
-            EmptyEventsScreen()
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
-@Composable
-fun DiaryDashboardLoadingStatePreview() {
-    DigitalDiaryTheme(diaryMood = DiaryMood.PASSIONATE) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            DiaryDashboardHeader(onRefreshClick = {})
-            LoadingScreen()
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
-@Composable
-fun EventCardPreview() {
-    DigitalDiaryTheme(diaryMood = DiaryMood.PASSIONATE) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(Dimens.card_padding_lg)
-        ) {
-            EventCard(
-                userEvent = createPreviewEvent(),
-                onClick = {},
-                onDelete = {},
-                onShare = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFFF5F5F5)
-@Composable
-fun HeaderPreview() {
-    DigitalDiaryTheme(diaryMood = DiaryMood.PASSIONATE) {
-        DiaryDashboardHeader(onRefreshClick = {})
-    }
-}
-
-// ============ PREVIEW DATA ============
-
-private fun createPreviewEvent(): UserEvent {
-    return UserEvent(
-        eventInfo = EventInfo(
-            eventId = 1L,
-            dateInfo = "2026-02-16 16:19:32.461892Z",
-            title = "Amazing Day at the Park",
-            description = "Had a wonderful time at the park today. The weather was perfect, and I spent time with family. We played games, had ice cream, and made wonderful memories together. The sunset was beautiful!",
-            emotion = "Happy"
-        ),
-        mediaPaths = listOf(
-            MediaInfo(1L, "/storage/emulated/0/DCIM/photo1.jpg", 1L),
-            MediaInfo(2L, "/storage/emulated/0/DCIM/photo2.jpg", 1L),
-            MediaInfo(3L, "/storage/emulated/0/DCIM/photo3.jpg", 1L)
-        ),
-        tags = listOf(
-            TagInfo(1L, "Family", 1L),
-            TagInfo(2L, "Fun", 1L),
-            TagInfo(3L, "Memories", 1L)
+    if (showDeleteDialog) {
+        PiConfirmationAlertDialog(
+            title = "Delete Entry",
+            message = "Are you sure you want to delete this diary entry? This action cannot be undone.",
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                onDelete()
+                showDeleteDialog = false
+            }
         )
-    )
-}
-
-private fun createPreviewEvents(): List<UserEvent> {
-    return listOf(
-        UserEvent(
-            eventInfo = EventInfo(
-                eventId = 1L,
-                dateInfo = "2026-02-16 16:19:32.461892Z",
-                title = "Amazing Day at the Park",
-                description = "Had a wonderful time at the park today. The weather was perfect, and I spent quality time with family...",
-                emotion = "Happy"
-            ),
-            mediaPaths = listOf(
-                MediaInfo(1L, "/storage/emulated/0/DCIM/photo1.jpg", 1L),
-                MediaInfo(2L, "/storage/emulated/0/DCIM/photo2.jpg", 1L)
-            ),
-            tags = listOf(
-                TagInfo(1L, "Family", 1L),
-                TagInfo(2L, "Fun", 1L)
-            )
-        ),
-        UserEvent(
-            eventInfo = EventInfo(
-                eventId = 2L,
-                dateInfo = "2026-02-15 03:58:27.402534Z",
-                title = "Productive Work Day",
-                description = "Completed several important projects at work. Feeling accomplished and energized. Had great collaboration with the team...",
-                emotion = "Excited"
-            ),
-            mediaPaths = emptyList(),
-            tags = listOf(
-                TagInfo(4L, "Work", 2L),
-                TagInfo(5L, "Achievement", 2L)
-            )
-        ),
-        UserEvent(
-            eventInfo = EventInfo(
-                eventId = 3L,
-                dateInfo = "2026-02-15 03:53:12.963754Z",
-                title = "Relaxing Evening",
-                description = "Spent the evening reading a good book and drinking tea. Perfect way to unwind after a busy day...",
-                emotion = "Calm"
-            ),
-            mediaPaths = listOf(
-                MediaInfo(3L, "/storage/emulated/0/Pictures/sunset.jpg", 3L)
-            ),
-            tags = listOf(
-                TagInfo(6L, "Relaxation", 3L)
-            )
-        )
-    )
+    }
 }

@@ -42,9 +42,6 @@ fun AddDiaryScreen(
         }
     }
 
-    val colorIndex = uiState.emotion.hashCode().rem(6).coerceAtLeast(0)
-    val emotionColor = getTemplateColor(colorIndex)
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -55,7 +52,6 @@ fun AddDiaryScreen(
             PiHeader(
                 title = if (eventId == null) "New Entry" else "Edit Entry",
                 onBackClick = onBack,
-                backgroundColor = emotionColor,
                 actions = {
                     PiActionIcon(
                         icon = Icons.Default.Check,
@@ -133,6 +129,7 @@ fun EmotionPicker(
             val isSelected = emotion == selectedEmotion
             val colorIndex = emotion.hashCode().rem(6).coerceAtLeast(0)
             val emotionColor = getTemplateColor(colorIndex)
+
 
             Surface(
                 modifier = Modifier

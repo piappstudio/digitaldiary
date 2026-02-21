@@ -53,6 +53,9 @@ import androidx.compose.ui.unit.dp
 import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
 import com.piappstudio.digitaldiary.database.entity.ReminderEvent
+import com.piappstudio.digitaldiary.ui.component.PiActionIcon
+import com.piappstudio.digitaldiary.ui.component.PiHeader
+import com.piappstudio.digitaldiary.ui.diary.component.PiConfirmationAlertDialog
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -81,8 +84,16 @@ fun ReminderDashboardScreen(
                 .padding(padding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            ReminderDashboardHeader(
-                onRefreshClick = { viewModel.refreshReminders() }
+            PiHeader(
+                title = "Upcoming Events",
+                subtitle = "Stay on track with your schedule",
+                actions = {
+                    PiActionIcon(
+                        icon = Icons.Default.Refresh,
+                        onClick = { viewModel.refreshReminders() },
+                        contentDescription = "Refresh events"
+                    )
+                }
             )
 
             if (isLoading && reminders.isEmpty()) {
@@ -94,46 +105,6 @@ fun ReminderDashboardScreen(
                     reminders = reminders,
                     onReminderClick = onNavigateDetail,
                     onDeleteReminder = { viewModel.deleteReminder(it) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReminderDashboardHeader(
-    onRefreshClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondary)
-            .padding(Dimens.card_padding_lg)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    "Upcoming Events",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onSecondary
-                )
-                Text(
-                    "Stay on track with your schedule",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f)
-                )
-            }
-
-            IconButton(onClick = onRefreshClick) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh reminders",
-                    tint = MaterialTheme.colorScheme.onSecondary,
-                    modifier = Modifier.size(Dimens.icon_size_md)
                 )
             }
         }
@@ -390,34 +361,8 @@ private fun ReminderCard(
 
     // Delete confirmation dialog
     if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Reminder") },
-            text = { Text("Are you sure you want to delete this reminder?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        onDelete()
-                        showDeleteDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
-                ) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = { showDeleteDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
+        PiConfirmationAlertDialog(title = "Delete Reminder", message = "Are you sure you want to delete this reminder?", onDismiss = { showDeleteDialog = false }, onConfirm = { onDelete()
+            showDeleteDialog = false})
     }
 }
 

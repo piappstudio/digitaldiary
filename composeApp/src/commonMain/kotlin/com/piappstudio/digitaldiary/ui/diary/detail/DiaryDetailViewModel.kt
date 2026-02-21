@@ -57,6 +57,18 @@ class DiaryDetailViewModel(private val diaryRepository: DiaryRepository) : ViewM
         }
     }
 
+    fun deleteEvent(eventId: Long, onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                diaryRepository.delete(eventId)
+                onDeleted()
+            } catch (e: Exception) {
+                Logger.e("DiaryDetailViewModel", e) { "Error deleting event: $eventId" }
+                uiState.update { it.copy(error = "Failed to delete entry") }
+            }
+        }
+    }
+
     fun clearError() {
         uiState.update { it.copy(error = null) }
     }

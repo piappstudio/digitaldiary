@@ -46,6 +46,8 @@ fun BottomNavGraph(appNavBackStack: NavBackStack<NavKey>) {
                     entry<PiRoute.BottomBar.Diary> {
                         DiaryDashboardScreen(onNavigateDetail = { eventId ->
                             appNavBackStack.add(PiRoute.DiaryDetail(eventId))
+                        }, onNavigateAdd = {
+                            appNavBackStack.add(PiRoute.AddDiary())
                         })
                     }
                     entry<PiRoute.BottomBar.Reminder> {

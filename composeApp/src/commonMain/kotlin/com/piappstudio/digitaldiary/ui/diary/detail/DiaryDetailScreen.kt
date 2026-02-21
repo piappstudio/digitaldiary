@@ -17,9 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -33,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +48,7 @@ import com.piappstudio.digitaldiary.database.entity.MediaInfo
 import com.piappstudio.digitaldiary.database.entity.UserEvent
 import com.piappstudio.digitaldiary.ui.component.PiActionIcon
 import com.piappstudio.digitaldiary.ui.component.PiHeader
+import com.piappstudio.digitaldiary.ui.diary.component.PiConfirmationAlertDialog
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -76,7 +82,11 @@ fun DiaryDetailScreen(
             medias = medias,
             onBackClick = onBackClick,
             onEdit = { onNavigateEdit(eventId) },
-            onDelete = { }
+            onDelete = {
+                viewModel.deleteEvent(eventId) {
+                    onBackClick()
+                }
+            }
         )
     } else {
         ErrorDetailScreen(
@@ -97,6 +107,7 @@ private fun DetailContent(
 ) {
     val emotionIndex = userEvent.eventInfo.emotion.hashCode().rem(6).coerceAtLeast(0)
     val emotionColor = getTemplateColor(emotionIndex)
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier
@@ -108,12 +119,16 @@ private fun DetailContent(
             PiHeader(
                 title = "📖 Diary Entry",
                 onBackClick = onBackClick,
-                backgroundColor = emotionColor,
                 actions = {
                     PiActionIcon(
                         icon = Icons.Default.Edit,
                         onClick = onEdit,
                         contentDescription = "Edit"
+                    )
+                    PiActionIcon(
+                        icon = Icons.Default.Delete,
+                        onClick = { showDeleteDialog = true },
+                        contentDescription = "Delete"
                     )
                 }
             )
@@ -282,6 +297,13 @@ private fun DetailContent(
         item {
             Spacer(modifier = Modifier.height(Dimens.biggest_space))
         }
+    }
+
+    if (showDeleteDialog) {
+        PiConfirmationAlertDialog(title = "Delete Entry", message = "Are you sure you want to delete this diary entry?", onDismiss = { showDeleteDialog = false }, onConfirm = {
+            onDelete()
+            showDeleteDialog = false
+        })
     }
 }
 
