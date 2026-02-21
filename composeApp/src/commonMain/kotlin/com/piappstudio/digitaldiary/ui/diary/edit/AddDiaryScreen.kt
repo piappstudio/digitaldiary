@@ -1,7 +1,5 @@
 package com.piappstudio.digitaldiary.ui.diary.edit
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.piappstudio.digitaldiary.common.theme.Dimens
@@ -130,21 +127,31 @@ fun EmotionPicker(
             val colorIndex = emotion.hashCode().rem(6).coerceAtLeast(0)
             val emotionColor = getTemplateColor(colorIndex)
 
-
-            Surface(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(Dimens.corner_full))
-                    .clickable { onEmotionSelected(emotion) },
-                color = if (isSelected) emotionColor else emotionColor.copy(alpha = 0.1f),
-                border = if (isSelected) null else BorderStroke(1.dp, emotionColor.copy(alpha = 0.5f))
-            ) {
-                Text(
-                    text = emotion,
-                    modifier = Modifier.padding(horizontal = Dimens.card_padding_md, vertical = Dimens.space),
-                    color = if (isSelected) Color.White else emotionColor,
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
+            FilterChip(
+                selected = isSelected,
+                onClick = { onEmotionSelected(emotion) },
+                label = { 
+                    Text(
+                        text = emotion,
+                        style = MaterialTheme.typography.labelMedium
+                    ) 
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = emotionColor,
+                    selectedLabelColor = Color.White,
+                    containerColor = emotionColor.copy(alpha = 0.1f),
+                    labelColor = emotionColor
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = isSelected,
+                    borderColor = emotionColor.copy(alpha = 0.5f),
+                    selectedBorderColor = Color.Transparent,
+                    borderWidth = 1.dp,
+                    selectedBorderWidth = 0.dp
+                ),
+                shape = RoundedCornerShape(Dimens.corner_full)
+            )
         }
     }
 }
