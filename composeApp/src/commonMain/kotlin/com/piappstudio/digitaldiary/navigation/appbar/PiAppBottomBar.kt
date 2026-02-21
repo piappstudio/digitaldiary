@@ -15,12 +15,19 @@ import androidx.navigation3.runtime.NavKey
 import com.piappstudio.digitaldiary.common.theme.Dimens
 
 fun NavBackStack<NavKey>.navigateSingleTop(route: NavKey) {
-    if (lastOrNull() != route) {
-        if (lastOrNull() in bottomNavItems) {
-            removeAt(lastIndex)
+    val existingIndex = indexOf(route)
+    if (existingIndex == -1) {
+        add(route)
+    } else if (existingIndex != size - 1) {
+        // Smarter approach to bring existing element to top:
+        // Shift all elements above it down by one, then place the target at the top.
+        // This avoids removeAt() which would destroy the associated ViewModel.
+        val targetRoute = this[existingIndex]
+        for (i in existingIndex until size - 1) {
+            this[i] = this[i + 1]
         }
+        this[size - 1] = targetRoute
     }
-    add(route)
 }
 
 @Composable
