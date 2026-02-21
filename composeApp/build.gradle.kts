@@ -78,7 +78,9 @@ kotlin {
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.jetbrains.lifecycle.viewmodelNavigation3)
 
-
+            // Image Picker
+            implementation(libs.image.picker.kmp)
+            implementation(libs.coil.compose)
 
         }
         commonTest.dependencies {

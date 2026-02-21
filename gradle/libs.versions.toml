@@ -35,6 +35,8 @@ multiplatform-nav3-ui = "1.0.0-alpha06"
 compose-multiplatform-lifecycle = "2.10.0-alpha05"
 icons-extended = "1.7.8"
 
+image-picker-kmp = "1.0.32"
+coil-kmp = "3.3.0"
 
 [libraries]
 jetbrains-material-icons-extended = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -89,6 +91,9 @@ jetbrains-lifecycle-viewmodelNavigation3 = { module = "org.jetbrains.androidx.li
 
 
 kotlinx-datetime = {group = "org.jetbrains.kotlinx",name = "kotlinx-datetime", version.ref = "kotlinx-datetime-version" }
+
+image-picker-kmp = { module = "io.github.ismoy:imagepickerkmp", version.ref = "image-picker-kmp" }
+coil-compose= {module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-kmp"}
 
 [plugins]
 

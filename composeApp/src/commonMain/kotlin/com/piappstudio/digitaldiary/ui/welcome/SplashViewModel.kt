@@ -16,7 +16,7 @@ class SplashViewModel(
 ) : ViewModel() {
 
     init {
-        insertDummyData()
+        //insertDummyData()
     }
 
     /**

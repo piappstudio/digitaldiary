@@ -40,8 +40,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.piappstudio.digitaldiary.common.theme.Dimens
 import com.piappstudio.digitaldiary.common.theme.getTemplateColor
 import com.piappstudio.digitaldiary.database.entity.MediaInfo
@@ -100,7 +102,7 @@ fun DiaryDetailScreen(
 @Composable
 private fun DetailContent(
     userEvent: UserEvent,
-    medias: List<*>,
+    medias: List<MediaInfo>,
     onBackClick: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit
@@ -287,9 +289,7 @@ private fun DetailContent(
             }
 
             items(medias) { media ->
-                if (media is MediaInfo) {
-                    PhotoItem(media = media)
-                }
+                PhotoItem(media = media)
             }
         }
 
@@ -319,45 +319,14 @@ private fun PhotoItem(media: MediaInfo) {
         shape = RoundedCornerShape(Dimens.corner_lg),
         elevation = CardDefaults.cardElevation(defaultElevation = Dimens.elevation_4)
     ) {
-        Box(
+        AsyncImage(
+            model = media.mediaPath,
+            contentDescription = "Diary Photo",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
-                .background(
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Dimens.card_padding_md),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Image,
-                    contentDescription = "Photo",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .size(Dimens.icon_size_xl)
-                        .padding(bottom = Dimens.space)
-                )
-                Text(
-                    "Photo",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = Dimens.half_space)
-                )
-                Text(
-                    media.mediaPath.substringAfterLast("/"),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
+                .height(300.dp),
+            contentScale = ContentScale.Crop
+        )
     }
 }
 

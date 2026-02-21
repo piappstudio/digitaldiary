@@ -8,6 +8,7 @@ import com.piappstudio.digitaldiary.database.dao.UserEventDao
 import com.piappstudio.digitaldiary.database.getDatabaseBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import org.koin.core.module.Module
 import org.koin.dsl.module
 
 val databaseModule = module {
@@ -31,4 +32,6 @@ val databaseModule = module {
     }
 }
 
-val commonModule = listOf(databaseModule, viewModelModules)
+expect val platformModule: Module
+
+val commonModule = listOf(databaseModule, platformModule, viewModelModules)
