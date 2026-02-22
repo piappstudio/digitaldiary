@@ -32,11 +32,11 @@ kotlin {
         namespace = "com.piappstudio.digitaldiary"
 
         defaultConfig {
-            applicationId = "com.piappstudio.digitaldiary"
+            applicationId = "com.bob.offlinediary"
             minSdk = libs.versions.android.minSdk.get().toInt()
             targetSdk = libs.versions.android.targetSdk.get().toInt()
-            versionCode = 66
-            versionName = "2.0"
+            versionCode = 173
+            versionName = "4.0"
         }
         packaging {
             resources {

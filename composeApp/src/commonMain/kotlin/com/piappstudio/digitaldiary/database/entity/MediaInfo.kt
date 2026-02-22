@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "media_info")
 data class MediaInfo(
-    @PrimaryKey var mediaId: Long?,
+    @PrimaryKey(autoGenerate = true) var mediaId: Long? = null,
     val mediaPath: String,
     var eventKey: Long
 )

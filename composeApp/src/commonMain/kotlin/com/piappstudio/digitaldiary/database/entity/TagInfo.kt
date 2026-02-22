@@ -14,9 +14,9 @@ package com.piappstudio.digitaldiary.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(tableName = "taginfo")
 data class TagInfo(
-    @PrimaryKey val tagId: Long,
+    @PrimaryKey(autoGenerate = true) val tagId: Long = 0,
     val tagName: String,
     val eventKey: Long
 )

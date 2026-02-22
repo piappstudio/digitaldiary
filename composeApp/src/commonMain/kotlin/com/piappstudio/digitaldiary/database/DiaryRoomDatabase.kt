@@ -26,7 +26,7 @@ import com.piappstudio.digitaldiary.database.entity.TagInfo
 
 @Database(
     entities = [EventInfo::class, MediaInfo::class, TagInfo::class, ReminderInfo::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -53,6 +53,21 @@ abstract class DiaryRoomDatabase : RoomDatabase() {
                 connection.execSQL("CREATE TABLE IF NOT EXISTS `reminder_table` (`reminderId` INTEGER, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `startDate` TEXT, `endDate` TEXT, `isReminderRequired` INTEGER NOT NULL, `remindBefore` INTEGER, PRIMARY KEY(`reminderId`))")
             }
         }
+
+        val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+            override fun migrate(connection: SQLiteConnection) {
+                // Migrate taginfo to support auto-generate
+                connection.execSQL("CREATE TABLE IF NOT EXISTS `taginfo_new` (`tagId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tagName` TEXT NOT NULL, `eventKey` INTEGER NOT NULL)")
+                connection.execSQL("INSERT INTO `taginfo_new` (`tagId`, `tagName`, `eventKey`) SELECT `tagId`, `tagName`, `eventKey` FROM `taginfo`")
+                connection.execSQL("DROP TABLE `taginfo`")
+                connection.execSQL("ALTER TABLE `taginfo_new` RENAME TO `taginfo`")
+                
+                // Also migrating media_info just in case, to ensure it also supports auto-generate if needed later
+                connection.execSQL("CREATE TABLE IF NOT EXISTS `media_info_new` (`mediaId` INTEGER PRIMARY KEY AUTOINCREMENT, `mediaPath` TEXT NOT NULL, `eventKey` INTEGER NOT NULL)")
+                connection.execSQL("INSERT INTO `media_info_new` (`mediaId`, `mediaPath`, `eventKey`) SELECT `mediaId`, `mediaPath`, `eventKey` FROM `media_info`")
+                connection.execSQL("DROP TABLE `media_info`")
+                connection.execSQL("ALTER TABLE `media_info_new` RENAME TO `media_info`")
+            }
+        }
     }
 }
-

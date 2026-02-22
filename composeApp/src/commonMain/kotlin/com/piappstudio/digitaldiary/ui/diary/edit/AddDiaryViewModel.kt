@@ -18,10 +18,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 data class AddDiaryUiState(
     val title: String = "",
@@ -32,6 +34,7 @@ data class AddDiaryUiState(
     val capturedPhoto: PhotoResult? = null,
     val selectedImages: List<GalleryPhotoResult> = emptyList(),
     val existingImages: List<String> = emptyList(),
+    val dateMillis: Long = Clock.System.now().toEpochMilliseconds(),
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null
@@ -64,7 +67,8 @@ class AddDiaryViewModel(
                 title = if (currentEventId == null) "" else state.title,
                 description = if (currentEventId == null) "" else state.description,
                 emotion = if (currentEventId == null) "Happy" else state.emotion,
-                tags = if (currentEventId == null) emptyList() else state.tags
+                tags = if (currentEventId == null) emptyList() else state.tags,
+                dateMillis = Clock.System.now().toEpochMilliseconds()
             ) 
         }
 
@@ -72,6 +76,15 @@ class AddDiaryViewModel(
             viewModelScope.launch {
                 val event = diaryRepository.getUserEvent(currentEventId!!).firstOrNull()
                 if (event != null) {
+                    // Try to parse existing date string to millis if possible
+                    val existingDateMillis = try {
+                        val localDateTime = LocalDateTime.parse(event.eventInfo.dateInfo)
+                        val instant = localDateTime.toInstant(TimeZone.currentSystemDefault())
+                        instant.toEpochMilliseconds()
+                    } catch (e: Exception) {
+                        Clock.System.now().toEpochMilliseconds()
+                    }
+
                     uiState.update { state ->
                         state.copy(
                             title = event.eventInfo.title,
@@ -79,6 +92,7 @@ class AddDiaryViewModel(
                             emotion = event.eventInfo.emotion,
                             tags = event.tags?.map { it.tagName } ?: emptyList(),
                             existingImages = event.mediaPaths?.map { it.mediaPath } ?: emptyList(),
+                            dateMillis = existingDateMillis,
                             isLoading = false
                         )
                     }
@@ -99,6 +113,10 @@ class AddDiaryViewModel(
 
     fun onEmotionChange(newEmotion: String) {
         uiState.update { it.copy(emotion = newEmotion) }
+    }
+
+    fun onDateChange(millis: Long) {
+        uiState.update { it.copy(dateMillis = millis, error = null) }
     }
 
     fun addTag(tag: String) {
@@ -153,17 +171,27 @@ class AddDiaryViewModel(
 
     fun saveEntry() {
         val state = uiState.value
+        
+        // Validation
         if (state.title.isBlank() || state.description.isBlank()) {
             uiState.update { it.copy(error = "Please fill in all fields") }
             return
+        }
+        
+        // Date validation: Should not be in the future (allow some buffer for clock skew)
+        val nowMillis = Clock.System.now().toEpochMilliseconds()
+        if (state.dateMillis > nowMillis + 300000) { // 5 minutes buffer
+             uiState.update { it.copy(error = "Date cannot be in the future") }
+             return
         }
 
         uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             try {
-                // Using fully qualified name to avoid conflict with kotlin.time.Clock
-                val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-                val dateInfo = now.toString()
+                // Use the selected date from the state
+                val selectedInstant = Instant.fromEpochMilliseconds(state.dateMillis)
+                val selectedDate = selectedInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+                val dateInfo = selectedDate.toString()
 
                 val eventInfo = EventInfo(
                     eventId = currentEventId,

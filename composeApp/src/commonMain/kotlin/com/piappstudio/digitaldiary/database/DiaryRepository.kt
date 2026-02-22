@@ -87,7 +87,7 @@ class DiaryRepository(private val userEventDao: UserEventDao) {
         // Update tags: simple approach - delete all and re-insert
         userEventDao.deleteTagInfo(eventId)
         userEvent.tags?.let { tags ->
-            val tagsToInsert = tags.map { it.copy(eventKey = eventId) }
+            val tagsToInsert = tags.map { it.copy(eventKey = eventId, tagId = 0) }
             userEventDao.insertTags(tagsToInsert)
         }
         
