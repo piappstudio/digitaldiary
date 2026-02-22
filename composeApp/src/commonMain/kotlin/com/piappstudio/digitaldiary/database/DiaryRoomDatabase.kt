@@ -36,7 +36,8 @@ abstract class DiaryRoomDatabase : RoomDatabase() {
 
     companion object {
 
-        const val DB_NAME = "diary_database.db"
+        // Changed back to original name without .db extension to preserve legacy data
+        const val DB_NAME = "diary_database"
 
         val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(connection: SQLiteConnection) {
@@ -58,6 +59,7 @@ abstract class DiaryRoomDatabase : RoomDatabase() {
             override fun migrate(connection: SQLiteConnection) {
                 // Migrate taginfo to support auto-generate
                 connection.execSQL("CREATE TABLE IF NOT EXISTS `taginfo_new` (`tagId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tagName` TEXT NOT NULL, `eventKey` INTEGER NOT NULL)")
+                // Note: SQLite table names are case-insensitive, so 'taginfo' handles legacy 'TagInfo'
                 connection.execSQL("INSERT INTO `taginfo_new` (`tagId`, `tagName`, `eventKey`) SELECT `tagId`, `tagName`, `eventKey` FROM `taginfo`")
                 connection.execSQL("DROP TABLE `taginfo`")
                 connection.execSQL("ALTER TABLE `taginfo_new` RENAME TO `taginfo`")
